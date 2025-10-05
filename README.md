@@ -80,3 +80,78 @@ kubectl get clusterrolebinding | grep haproxy
 
 📸 Screenshot:  
 ![ClusterRoleBinding Created](./screenshots/04-clusterrolebinding-created.png)
+
+## 🧩 Step 5 — Create Backend Deployment
+
+### 🎯 Goal
+Deploy the default backend service for HAProxy.  
+This deployment provides a simple default response for any request that doesn’t match other routes handled by the ingress controller.
+
+**Manifest:** [05-backend-deployment.yaml](./manifests/05-backend-deployment.yaml)
+
+**Commands:**
+```bash
+kubectl apply -f manifests/05-backend-deployment.yaml
+kubectl get deployment -n haproxy-controller-devops
+```
+
+📸 Screenshot:  
+![Backend Deployment Created](./screenshots/05-backend-deployment-created.png)
+
+
+## 🧩 Step 6 — Create Backend Service
+
+### 🎯 Goal
+Expose the backend deployment internally within the cluster so that the HAProxy ingress controller can route traffic to it.  
+This service links to the backend pods using the `run=ingress-default-backend` label.
+
+**Manifest:** [06-backend-service.yaml](./manifests/06-backend-service.yaml)
+
+**Commands:**
+```bash
+kubectl apply -f manifests/06-backend-service.yaml
+kubectl get svc -n haproxy-controller-devops
+```
+
+
+📸 Screenshot:  
+![Backend Service Created](./screenshots/06-backend-service-created.png)
+
+
+## 🧩 Step 7 — Create Frontend (HAProxy Ingress) Deployment
+
+### 🎯 Goal
+Deploy the **HAProxy Ingress Controller**, which will route external traffic into the cluster.  
+This deployment uses the ServiceAccount and ClusterRole we created earlier and connects to the backend service as its default route.
+
+**Manifest:** [07-frontend-deployment.yaml](./manifests/07-frontend-deployment.yaml)
+
+**Commands:**
+```bash
+kubectl apply -f manifests/07-frontend-deployment.yaml
+kubectl get deployments -n haproxy-controller-devops
+```
+
+📸 Screenshot:  
+![Frontend Deployment Created](./screenshots/07-frontend-deployment-created.png)
+
+
+## 🧩 Step 8 — Create Frontend Service (NodePort)
+
+### 🎯 Goal
+Expose the **HAProxy Ingress Controller** externally so it can receive HTTP and HTTPS traffic from outside the cluster.  
+This NodePort service forwards external ports 32456 (HTTP), 32567 (HTTPS), and 32678 (stats) to the HAProxy ingress pods.
+
+**Manifest:** [08-frontend-service.yaml](./manifests/08-frontend-service.yaml)
+
+**Commands:**
+```bash
+kubectl apply -f manifests/08-frontend-service.yaml
+kubectl get svc -n haproxy-controller-devops
+```
+
+📸 Screenshot:  
+![Frontend Service Created](./screenshots/08-frontend-service-created.png)
+
+
+
